@@ -1,0 +1,1 @@
+export { default } from 'ember-cli-user-media/components/user-media-src';
