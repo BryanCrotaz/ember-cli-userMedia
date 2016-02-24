@@ -34,7 +34,7 @@ export default Ember.Component.extend({
 	_updateStream: function () {
 		this._stopStream();
 		this._startStream();
-	}.observes("mediaConstraints", "mediaConstraints.videa", "mediaConstraints.audio"),
+	}.observes("mediaConstraints", "mediaConstraints.video", "mediaConstraints.audio"),
 
 	_startup: function () {
 		this._startStream();
