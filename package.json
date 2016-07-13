@@ -1,6 +1,6 @@
 {
   "name": "ember-cli-usermedia",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "description": "Ember addon to provide cross-browser getUserMedia",
   "directories": {
     "doc": "doc",
