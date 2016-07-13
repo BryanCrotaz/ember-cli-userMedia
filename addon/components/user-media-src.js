@@ -38,10 +38,10 @@ export default Ember.Component.extend({
 
 	_startup: function () {
 		this._startStream();
-	}.on('willInsertElement'),
+	}.on('didInsertElement'),
 
 	_shutdown: function () {
 		this._stopStream();
-	}.on('didDestroyElement')
+	}.on('willDestroyElement')
 
 });
