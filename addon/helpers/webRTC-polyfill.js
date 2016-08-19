@@ -1,3 +1,5 @@
+'use strict';
+
 import Ember from 'ember';
 
 /*
@@ -15,8 +17,6 @@ import Ember from 'ember';
 /* global mozRTCIceCandidate, mozRTCPeerConnection, Promise,
 mozRTCSessionDescription, webkitRTCPeerConnection, MediaStreamTrack */
 /* exported trace,requestUserMedia */
-
-'use strict';
 
 var getUserMedia = null;
 var attachMediaStream = null;
@@ -403,10 +403,10 @@ if (typeof window === 'undefined' || !window.navigator) {
 
   getUserMedia = function(constraints, onSuccess, onError) {
     if (constraints.audio) {
-      constraints.audio = constraintsToChrome(constraints.audio);
+      Ember.set(constraints, 'audio', constraintsToChrome(constraints.audio));
     }
     if (constraints.video) {
-      constraints.video = constraintsToChrome(constraints.video);
+      Ember.set(constraints, 'video', constraintsToChrome(constraints.video));
     }
     webrtcUtils.log('chrome: ' + JSON.stringify(constraints));
     return navigator.webkitGetUserMedia(constraints, onSuccess, onError);
