@@ -1,3 +1,5 @@
+import Ember from 'ember';
+
 /*
  *  Copyright (c) 2014 The WebRTC project authors. All Rights Reserved.
  *
@@ -188,10 +190,10 @@ if (typeof window === 'undefined' || !window.navigator) {
     if (webrtcDetectedVersion < 38) {
       webrtcUtils.log('spec: ' + JSON.stringify(constraints));
       if (constraints.audio) {
-        constraints.audio = constraintsToFF37(constraints.audio);
+        Ember.set(constraints, 'audio', constraintsToFF37(constraints.audio));
       }
       if (constraints.video) {
-        constraints.video = constraintsToFF37(constraints.video);
+        Ember.set(constraints, 'video', constraintsToFF37(constraints.video));
       }
       webrtcUtils.log('ff37: ' + JSON.stringify(constraints));
     }
