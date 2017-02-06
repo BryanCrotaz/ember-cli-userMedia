@@ -444,8 +444,10 @@ if (typeof window === 'undefined' || !window.navigator) {
         bind(navigator.mediaDevices);
     navigator.mediaDevices.getUserMedia = function(c) {
       webrtcUtils.log('spec:   ' + JSON.stringify(c)); // whitespace for alignment
-      c.audio = constraintsToChrome(c.audio);
-      c.video = constraintsToChrome(c.video);
+      Ember.setProperties(c, {
+        video: constraintsToChrome(c.video),
+        audio: constraintsToChrome(c.audio)
+      });
       webrtcUtils.log('chrome: ' + JSON.stringify(c));
       return origGetUserMedia(c);
     };
