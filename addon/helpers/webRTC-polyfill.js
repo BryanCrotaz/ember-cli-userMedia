@@ -2,6 +2,8 @@
 
 import Ember from 'ember';
 
+const {reject} = Ember.RSVP;
+
 /*
  *  Copyright (c) 2014 The WebRTC project authors. All Rights Reserved.
  *
@@ -50,6 +52,13 @@ function trace(text) {
   } else {
     webrtcUtils.log(text);
   }
+}
+
+// Returns the result of getUserMedia as a Promise.
+function requestUserMedia(constraints) {
+  return new Promise(function(resolve, reject) {
+    getUserMedia(constraints, resolve, reject);
+  });
 }
 
 if (typeof window === 'object') {
@@ -204,13 +213,13 @@ if (typeof window === 'undefined' || !window.navigator) {
 
   // Shim for mediaDevices on older versions.
   if (!navigator.mediaDevices) {
-    navigator.mediaDevices = {getUserMedia: requestUserMedia,
+    navigator.mediaDevices = {
+      getUserMedia: requestUserMedia,
       addEventListener: function() { },
       removeEventListener: function() { }
     };
   }
-  navigator.mediaDevices.enumerateDevices =
-      navigator.mediaDevices.enumerateDevices || function() {
+  navigator.mediaDevices.enumerateDevices = navigator.mediaDevices.enumerateDevices || function() {
     return new Promise(function(resolve) {
       var infos = [
         {kind: 'audioinput', deviceId: 'default', label: '', groupId: ''},
@@ -350,7 +359,7 @@ if (typeof window === 'undefined' || !window.navigator) {
   });
 
   // getUserMedia constraints shim.
-  var constraintsToChrome = function(c) {
+  var constraintsToChrome = c => {
     if (typeof c !== 'object' || c.mandatory || c.optional) {
       return c;
     }
@@ -401,7 +410,7 @@ if (typeof window === 'undefined' || !window.navigator) {
     return cc;
   };
 
-  getUserMedia = function(constraints, onSuccess, onError) {
+  navigator.getUserMedia = (constraints, onSuccess, onError) => {
     if (constraints.audio) {
       Ember.set(constraints, 'audio', constraintsToChrome(constraints.audio));
     }
@@ -411,12 +420,11 @@ if (typeof window === 'undefined' || !window.navigator) {
     webrtcUtils.log('chrome: ' + JSON.stringify(constraints));
     return navigator.webkitGetUserMedia(constraints, onSuccess, onError);
   };
-  navigator.getUserMedia = getUserMedia;
 
   if (!navigator.mediaDevices) {
-    navigator.mediaDevices = {getUserMedia: requestUserMedia,
-                              enumerateDevices: function() {
-      return new Promise(function(resolve) {
+    navigator.mediaDevices = {
+      getUserMedia: requestUserMedia,
+      enumerateDevices: () => new Promise(function(resolve) {
         var kinds = {audio: 'audioinput', video: 'videoinput'};
         return MediaStreamTrack.getSources(function(devices) {
           resolve(devices.map(function(device) {
@@ -426,23 +434,26 @@ if (typeof window === 'undefined' || !window.navigator) {
                     groupId: ''};
           }));
         });
-      });
-    }};
+      })
+    };
   }
 
   // A shim for getUserMedia method on the mediaDevices object.
   // TODO(KaptenJansson) remove once implemented in Chrome stable.
+  if (!navigator || !navigator.mediaDevices) {
+    return reject("browser capability not available: getUserMedia");
+  }
+
   if (!navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia = function(constraints) {
+    navigator.mediaDevices.getUserMedia = (constraints) => {
       return requestUserMedia(constraints);
     };
   } else {
     // Even though Chrome 45 has navigator.mediaDevices and a getUserMedia
     // function which returns a Promise, it does not accept spec-style
     // constraints.
-    var origGetUserMedia = navigator.mediaDevices.getUserMedia.
-        bind(navigator.mediaDevices);
-    navigator.mediaDevices.getUserMedia = function(c) {
+    var origGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = (c) => {
       webrtcUtils.log('spec:   ' + JSON.stringify(c)); // whitespace for alignment
       Ember.setProperties(c, {
         video: constraintsToChrome(c.video),
@@ -467,7 +478,7 @@ if (typeof window === 'undefined' || !window.navigator) {
   }
 
   // Attach a media stream to an element.
-  attachMediaStream = function(element, stream) {
+  attachMediaStream = (element, stream) => {
     if (webrtcDetectedVersion >= 43) {
       element.srcObject = stream;
     } else if (typeof element.src !== 'undefined') {
@@ -476,7 +487,7 @@ if (typeof window === 'undefined' || !window.navigator) {
       webrtcUtils.log('Error attaching stream to element.');
     }
   };
-  reattachMediaStream = function(to, from) {
+  reattachMediaStream = (to, from) => {
     if (webrtcDetectedVersion >= 43) {
       to.srcObject = from.srcObject;
     } else {
@@ -496,13 +507,6 @@ if (typeof window === 'undefined' || !window.navigator) {
   webrtcMinimumVersion = 12;
 } else {
   webrtcUtils.log('Browser does not appear to be WebRTC-capable');
-}
-
-// Returns the result of getUserMedia as a Promise.
-function requestUserMedia(constraints) {
-  return new Promise(function(resolve, reject) {
-    getUserMedia(constraints, resolve, reject);
-  });
 }
 
 var webrtcTesting = {};
