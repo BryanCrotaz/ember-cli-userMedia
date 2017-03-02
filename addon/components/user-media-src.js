@@ -2,46 +2,54 @@ import Ember from 'ember';
 import layout from '../templates/components/user-media-src';
 import polyfill from '../helpers/webRTC-polyfill';
 
+const {observer, get, set, on, RSVP} = Ember;
+const {resolve} = RSVP;
+
 export default Ember.Component.extend({
 
 	layout: layout,
 	tagName: '',
 
-	mediaConstraints: {video: true, audio:false},
+	mediaConstraints: {video: true, audio: false},
 
-	videoUrl: "",
+	videoUrl: null,
 	error: null,
 
 	_createSrc: URL ? URL.createObjectURL : function(stream) {return stream;},
 	_revokeSrc: URL ? URL.revokeObjectURL : function(stream) {return stream;},
 
 	_startStream() {
-		this.set('error', null);
-		navigator.mediaDevices.getUserMedia(this.get('mediaConstraints'))
+		if (!navigator || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+			set(this, 'error', "getUserMedia not available");
+			return resolve();
+		}
+		set(this, 'error', null);
+		return navigator.mediaDevices.getUserMedia(get(this, 'mediaConstraints'))
 		.then(stream => {
-			this.set('videoUrl', this._createSrc(stream));
+			set(this, 'videoUrl', this._createSrc(stream));
 		})
 		.catch(err => {
-			this.set('error', err);
+			set(this, 'videoUrl', null);
+			set(this, 'error', err);
 		});
 	},
 
-	_stopStream() {
-		this._revokeSrc(this.get('videoUrl'));
-		this.set('videoUrl', null);
+	_stopStream() {		
+		this._revokeSrc(get(this, 'videoUrl'));
+		set(this, 'videoUrl', null);
 	},
 
-	_updateStream: function () {
+	_updateStream: observer("mediaConstraints", "mediaConstraints.video", "mediaConstraints.audio", function() {
 		this._stopStream();
 		this._startStream();
-	}.observes("mediaConstraints", "mediaConstraints.video", "mediaConstraints.audio"),
+	}),
 
-	_startup: function () {
+	_startup: on('didInsertElement', function () {
 		this._startStream();
-	}.on('didInsertElement'),
+	}),
 
-	_shutdown: function () {
+	_shutdown: on('willDestroyElement', function () {
 		this._stopStream();
-	}.on('willDestroyElement')
+	})
 
 });
