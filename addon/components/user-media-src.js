@@ -24,11 +24,13 @@ export default Ember.Component.extend({
 			return resolve();
 		}
 		set(this, 'error', null);
-		return navigator.mediaDevices.getUserMedia(get(this, 'mediaConstraints'))
+		let constraints = get(this, 'mediaConstraints');
+		return navigator.mediaDevices.getUserMedia(constraints)
 		.then(stream => {
 			set(this, 'videoUrl', this._createSrc(stream));
 		})
 		.catch(err => {
+			console.log("error creating user media stream: "+err+"\nconstraints: "+JSON.stringify(constraints, null, 2));
 			set(this, 'videoUrl', null);
 			set(this, 'error', err);
 		});
