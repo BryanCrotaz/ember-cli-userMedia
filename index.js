@@ -1,6 +1,6 @@
-/* jshint node: true */
+/* eslint-env node */
 'use strict';
 
 module.exports = {
-  name: 'ember-cli-user-media'
+  name: 'ember-cli-usermedia'
 };
