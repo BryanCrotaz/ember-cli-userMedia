@@ -38,7 +38,9 @@ export default Ember.Component.extend({
 
 	_stopStream() {		
 		this._revokeSrc(get(this, 'videoUrl'));
-		set(this, 'videoUrl', null);
+		if (!this.get('isDestroying') && !this.get('isDestroyed')) {
+			set(this, 'videoUrl', null);
+		}
 	},
 
 	_updateStream: observer("mediaConstraints", "mediaConstraints.video", "mediaConstraints.audio", function() {
@@ -46,12 +48,14 @@ export default Ember.Component.extend({
 		this._startStream();
 	}),
 
-	_startup: on('didInsertElement', function () {
+	didInsertElement () {
+		this._super(...arguments);
 		this._startStream();
-	}),
+	},
 
-	_shutdown: on('willDestroyElement', function () {
+	willDestroyElement () {
+		this._super(...arguments);
 		this._stopStream();
-	})
+	}
 
 });
