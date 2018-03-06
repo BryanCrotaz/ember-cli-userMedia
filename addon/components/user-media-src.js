@@ -1,11 +1,13 @@
-import Ember from 'ember';
+import Component from '@ember/component';
+import { set, get, observer } from '@ember/object';
+import { on } from '@ember/object/evented';
+import RSVP from 'rsvp';
 import layout from '../templates/components/user-media-src';
 import polyfill from '../helpers/webRTC-polyfill';
 
-const {observer, get, set, on, RSVP} = Ember;
 const {resolve} = RSVP;
 
-export default Ember.Component.extend({
+export default Component.extend({
 
 	layout: layout,
 	tagName: '',

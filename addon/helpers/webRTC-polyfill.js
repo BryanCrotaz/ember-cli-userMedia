@@ -1,6 +1,5 @@
+import { set, setProperties } from '@ember/object';
 'use strict';
-
-import Ember from 'ember';
 
 /*
  *  Copyright (c) 2014 The WebRTC project authors. All Rights Reserved.
@@ -190,10 +189,10 @@ if (typeof window === 'undefined' || !window.navigator) {
     if (webrtcDetectedVersion < 38) {
       webrtcUtils.log('spec: ' + JSON.stringify(constraints));
       if (constraints.audio) {
-        Ember.set(constraints, 'audio', constraintsToFF37(constraints.audio));
+        set(constraints, 'audio', constraintsToFF37(constraints.audio));
       }
       if (constraints.video) {
-        Ember.set(constraints, 'video', constraintsToFF37(constraints.video));
+        set(constraints, 'video', constraintsToFF37(constraints.video));
       }
       webrtcUtils.log('ff37: ' + JSON.stringify(constraints));
     }
@@ -403,10 +402,10 @@ if (typeof window === 'undefined' || !window.navigator) {
 
   getUserMedia = function(constraints, onSuccess, onError) {
     if (constraints.audio) {
-      Ember.set(constraints, 'audio', constraintsToChrome(constraints.audio));
+      set(constraints, 'audio', constraintsToChrome(constraints.audio));
     }
     if (constraints.video) {
-      Ember.set(constraints, 'video', constraintsToChrome(constraints.video));
+      set(constraints, 'video', constraintsToChrome(constraints.video));
     }
     webrtcUtils.log('chrome: ' + JSON.stringify(constraints));
     return navigator.webkitGetUserMedia(constraints, onSuccess, onError);
@@ -444,7 +443,7 @@ if (typeof window === 'undefined' || !window.navigator) {
         bind(navigator.mediaDevices);
     navigator.mediaDevices.getUserMedia = function(c) {
       webrtcUtils.log('spec:   ' + JSON.stringify(c)); // whitespace for alignment
-      Ember.setProperties(c, {
+      setProperties(c, {
         video: constraintsToChrome(c.video),
         audio: constraintsToChrome(c.audio)
       });
