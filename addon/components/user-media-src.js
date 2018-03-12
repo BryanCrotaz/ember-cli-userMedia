@@ -1,9 +1,9 @@
 import Component from '@ember/component';
 import { set, get, observer } from '@ember/object';
-import { on } from '@ember/object/evented';
+//import { on } from '@ember/object/evented';
 import RSVP from 'rsvp';
 import layout from '../templates/components/user-media-src';
-import polyfill from '../helpers/webRTC-polyfill';
+//import polyfill from '../helpers/webRTC-polyfill';
 
 const {resolve} = RSVP;
 
