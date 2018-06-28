@@ -12,13 +12,20 @@ export default Component.extend({
 	layout: layout,
 	tagName: '',
 
-	mediaConstraints: {video: true, audio: false},
+	mediaConstraints: null,
 
 	videoUrl: null,
 	error: null,
 
-	_createSrc: URL ? URL.createObjectURL : function(stream) {return stream;},
-	_revokeSrc: URL ? URL.revokeObjectURL : function(stream) {return stream;},
+	_createSrc: null,
+	_revokeSrc: null,
+
+	init() {
+		this._super();
+		this.mediaConstraints = {video: true, audio: false};
+		this._createSrc = URL ? URL.createObjectURL : function(stream) {return stream;};
+		this._revokeSrc = URL ? URL.revokeObjectURL : function(stream) {return stream;};
+	},
 
 	_startStream() {
 		if (!navigator || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -32,7 +39,8 @@ export default Component.extend({
 			set(this, 'videoUrl', this._createSrc(stream));
 		})
 		.catch(err => {
-			console.log("error creating user media stream: "+err+"\nconstraints: "+JSON.stringify(constraints, null, 2));
+			// eslint-disable-next-line
+			console.error("error creating user media stream: "+err+"\nconstraints: "+JSON.stringify(constraints, null, 2));
 			set(this, 'videoUrl', null);
 			set(this, 'error', err);
 		});
