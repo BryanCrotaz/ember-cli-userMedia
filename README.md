@@ -36,8 +36,10 @@ myConstraints: { video: true; audio: false; } // default
 To do something more sophisticated in markup, use the block form:
 
 ```
-{{#user-media-src mediaConstraints=myConstraints as |videoUrl| }}
-	<video class="webcam" autoplay=true src={{videoUrl}} />
+{{#user-media-src mediaConstraints=myConstraints as |media| }}
+	<video class="webcam" autoplay=true src={{media.videoUrl}} />
+	<!-- or -->
+  <video class="webcam" autoplay=true srcObject={{media.videoStream}} />
 {{/user-media-src}}
 ```
 
