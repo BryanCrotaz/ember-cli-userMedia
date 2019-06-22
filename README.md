@@ -2,6 +2,15 @@
 
 Ember addon providing cross browser access to getUserMedia
 
+
+Compatibility
+------------------------------------------------------------------------------
+
+* Ember.js v2.18 or above
+* Ember CLI v2.13 or above
+* Node.js v8 or above
+
+
 Installation
 ------------------------------------------------------------------------------
 
@@ -48,7 +57,6 @@ To do something more sophisticated in markup, use the block form:
 * `ember serve`
 * Visit the dummy application at [http://localhost:4200](http://localhost:4200).
 
-For more information on using ember-cli, visit [https://ember-cli.com/](https://ember-cli.com/).
 
 License
 ------------------------------------------------------------------------------
