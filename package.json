@@ -1,6 +1,6 @@
 {
   "name": "ember-cli-usermedia",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Easily use WebRTC in Ember.",
   "keywords": [
     "ember-addon"
