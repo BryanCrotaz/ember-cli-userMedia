@@ -1,5 +1,5 @@
 {{#if hasBlock}}
-	{{yield videoUrl}}
+  {{yield (hash videoUrl videoStream)}}
 {{else}}
-	<video autoplay=true src={{videoUrl}} />
+  <video autoplay="true" srcObject={{videoStream}}/>
 {{/if}}

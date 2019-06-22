@@ -13,7 +13,8 @@ export default Component.extend({
 
 	mediaConstraints: null,
 
-	videoUrl: null,
+  videoUrl: null,
+  videoStream: null,
 	error: null,
 
 	_createSrc: null,
@@ -22,8 +23,8 @@ export default Component.extend({
 	init() {
 		this._super();
 		this.mediaConstraints = {video: true, audio: false};
-		this._createSrc = URL ? URL.createObjectURL : function(stream) {return stream;};
-		this._revokeSrc = URL ? URL.revokeObjectURL : function(stream) {return stream;};
+		this._createSrc = URL && URL.createObjectURL ? URL.createObjectURL : function(stream) {return stream;};
+		this._revokeSrc = URL && URL.revokeObjectURL ? URL.revokeObjectURL : function(stream) {return stream;};
 	},
 
 	_startStream: task(function * () {
@@ -34,7 +35,8 @@ export default Component.extend({
 		set(this, 'error', null);
 		let constraints = get(this, 'mediaConstraints');
 		try {
-			let stream = yield navigator.mediaDevices.getUserMedia(constraints)
+      let stream = yield navigator.mediaDevices.getUserMedia(constraints)
+      set(this, 'videoStream', stream);
 			set(this, 'videoUrl', this._createSrc(stream));
 		} catch (err) {
 			// eslint-disable-next-line
@@ -45,7 +47,12 @@ export default Component.extend({
 	}),
 
 	_stopStream: task(function * () {
-		yield this._revokeSrc(get(this, 'videoUrl'));
+    if (this.videoStream) {
+      let tracks = this.videoStream.getTracks();
+      tracks.forEach(track => track.stop());
+      set(this, 'videoStream', null);
+    }
+		yield this._revokeSrc(this.videoUrl);
 		set(this, 'videoUrl', null);
 	}),
 
