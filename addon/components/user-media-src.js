@@ -37,10 +37,8 @@ export default Component.extend({
 		try {
       let stream = yield navigator.mediaDevices.getUserMedia(constraints)
       set(this, 'videoStream', stream);
-			set(this, 'videoUrl', this._createSrc(stream));
+      set(this, 'videoUrl', this._createSrc(stream));
 		} catch (err) {
-			// eslint-disable-next-line
-			console.error("error creating user media stream: "+err+"\nconstraints: "+JSON.stringify(constraints, null, 2));
 			set(this, 'videoUrl', null);
 			set(this, 'error', err);
 		}
