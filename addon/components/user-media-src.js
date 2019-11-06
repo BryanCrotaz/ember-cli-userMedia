@@ -59,6 +59,7 @@ export default Component.extend({
 		yield this.get('startStream').perform();
 	}).restartable(),
 
+  // eslint-disable-next-line ember/no-observers
 	_updateStream: observer("mediaConstraints", "mediaConstraints.video", "mediaConstraints.audio", function() {
 		this.get('_restartStream').perform()
 	}),

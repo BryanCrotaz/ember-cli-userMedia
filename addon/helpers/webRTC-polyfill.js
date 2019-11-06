@@ -14,7 +14,8 @@ import { set, setProperties } from '@ember/object';
    eqeqeq: true, forin: false, globalstrict: true, node: true,
    quotmark: single, undef: true, unused: strict */
 /* global mozRTCIceCandidate, mozRTCPeerConnection, Promise,
-mozRTCSessionDescription, webkitRTCPeerConnection, MediaStreamTrack */
+mozRTCSessionDescription, webkitRTCPeerConnection, MediaStreamTrack, 
+module, define */
 /* exported trace,requestUserMedia */
 
 var getUserMedia = null;
@@ -30,6 +31,7 @@ var webrtcUtils = {
         typeof require === 'function' && typeof define === 'function') {
       return;
     }
+    // eslint-disable-next-line no-console
     console.log.apply(console, arguments);
   },
   extractVersion: function(uastring, expr, pos) {
@@ -37,19 +39,6 @@ var webrtcUtils = {
     return match && match.length >= pos && parseInt(match[pos], 10);
   }
 };
-
-function trace(text) {
-  // This function is used for logging.
-  if (text[text.length - 1] === '\n') {
-    text = text.substring(0, text.length - 1);
-  }
-  if (window.performance) {
-    var now = (window.performance.now() / 1000).toFixed(3);
-    webrtcUtils.log(now + ': ' + text);
-  } else {
-    webrtcUtils.log(text);
-  }
-}
 
 if (typeof window === 'object') {
   if (window.HTMLMediaElement &&
@@ -254,7 +243,7 @@ if (typeof window === 'undefined' || !window.navigator) {
 
     var pc = new webkitRTCPeerConnection(pcConfig, pcConstraints); // jscs:ignore requireCapitalizedConstructors
     var origGetStats = pc.getStats.bind(pc);
-    pc.getStats = function(selector, successCallback, errorCallback) { // jshint ignore: line
+    pc.getStats = function(selector, successCallback /*, errorCallback */) { // jshint ignore: line
       var self = this;
       var args = arguments;
 
@@ -511,7 +500,9 @@ try {
       webrtcDetectedVersion = version;
     }
   });
-} catch (e) {}
+} catch (e) {
+  // ignore errors
+}
 
 if (typeof module !== 'undefined') {
   var RTCPeerConnection;
