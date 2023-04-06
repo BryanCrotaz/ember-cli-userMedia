@@ -1,27 +1,26 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency-decorators';
-import { tagName } from '@ember-decorators/component';
-import { observes } from '@ember-decorators/object';
+import { taskFor } from 'ember-concurrency-ts';
 
 type MapToString = (object: any) => string;
 type RevokeUrlFn = (url: string) => void;
 
-@tagName('')
-export default class UserMediaSrc extends Component {
+export interface UserMediaSrcArgs {
+  mediaConstraints: MediaStreamConstraints;
+}
 
-	@tracked mediaConstraints!: MediaStreamConstraints;
+export default class UserMediaSrc extends Component<UserMediaSrcArgs> {
 
   @tracked videoUrl?: string;
   @tracked videoStream?: MediaStream;
-	@tracked error?: string;
+	@tracked error?: any;
 
 	private _createSrcUrl?: MapToString = undefined;
   private _revokeSrcUrl?: RevokeUrlFn = undefined;
 
-	constructor(options: {}) {
-    super(options);
-    this.mediaConstraints = {video: true, audio: false};
+	constructor(owner: unknown, args: UserMediaSrcArgs) {
+    super(owner, args);
     if (URL && URL.createObjectURL) {
       this._createSrcUrl = URL.createObjectURL;
     }
@@ -35,14 +34,18 @@ export default class UserMediaSrc extends Component {
 		this._stopStream();
 	}
   
+  get actualMediaConstraints(): MediaStreamConstraints {
+    return this.args.mediaConstraints || {video: true, audio: false};
+  }
+
   @task
-  private _startStream = task(function * (this: UserMediaSrc) {
+  private * _startStream (this: UserMediaSrc) {
 		if (!navigator || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
 			this.error = "getUserMedia not available";
 			return;
 		}
 		this.error = undefined;
-		let constraints = this.mediaConstraints;
+		let constraints = this.actualMediaConstraints;
 		try {
       this.videoStream = yield navigator.mediaDevices.getUserMedia(constraints)
       if (this._createSrcUrl) {
@@ -52,7 +55,7 @@ export default class UserMediaSrc extends Component {
 			this.videoUrl = undefined;
 			this.error = err;
 		}
-	})
+	}
 
   private _stopStream (this: UserMediaSrc) {
 		try {
@@ -76,13 +79,8 @@ export default class UserMediaSrc extends Component {
   @task({
     restartable: true
   })
-	private _restartStream = task(function * (this: UserMediaSrc) {
+	private * _restartStream(this: UserMediaSrc) {
 		this._stopStream();
-		yield this._startStream.perform();
-	})
-
-  @observes("mediaConstraints")
-  _mediaConstraintsChanged(this: UserMediaSrc) {
-    this._restartStream.perform();
-  }
+		yield taskFor(this._startStream).perform();
+	}
 }
