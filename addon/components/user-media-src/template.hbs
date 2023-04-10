@@ -1,6 +1,7 @@
 {{did-update (perform this._restartStream) @mediaConstraints}}
-{{#if hasBlock}}
-  {{yield (hash videoUrl videoStream)}}
+{{#if (has-block)}}
+  {{yield (hash this.videoUrl this.videoStream)}}
 {{else}}
-  <video autoplay="true" srcObject={{videoStream}}/>
+  {{!-- template-lint-disable require-media-caption --}}
+  <video autoplay="true" srcObject={{this.videoStream}}/>
 {{/if}}
